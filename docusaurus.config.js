@@ -1,29 +1,24 @@
 module.exports = {
-  title: 'My Site',
-  tagline: 'The tagline of my site',
-  url: 'https://your-docusaurus-test-site.com',
+  title: 'Graia Document',
+  tagline: 'Graia Framework 的新版文档, 由开发者名义释出.',
+  url: 'https://graia-document.vercel.app/',
   baseUrl: '/',
   favicon: 'img/favicon.ico',
-  organizationName: 'facebook', // Usually your GitHub org/user name.
-  projectName: 'docusaurus', // Usually your repo name.
+  organizationName: 'GraiaProject', // Usually your GitHub org/user name.
+  projectName: 'Application', // Usually your repo name.
   themeConfig: {
     navbar: {
-      title: 'My Site',
-      logo: {
-        alt: 'My Site Logo',
-        src: 'img/logo.svg',
-      },
+      title: 'Graia Document',
       links: [
         {
-          to: 'docs/doc1',
+          to: 'docs/intro',
           activeBasePath: 'docs',
-          label: 'Docs',
+          label: '文档',
           position: 'left',
         },
-        {to: 'blog', label: 'Blog', position: 'left'},
         {
-          href: 'https://github.com/facebook/docusaurus',
-          label: 'GitHub',
+          href: 'https://github.com/GreyElaina/GraiaDocument',
+          label: 'Repo on GitHub',
           position: 'right',
         },
       ],
@@ -32,50 +27,38 @@ module.exports = {
       style: 'dark',
       links: [
         {
-          title: 'Docs',
+          title: '旗下项目',
           items: [
             {
-              label: 'Style Guide',
-              to: 'docs/doc1',
+              label: 'Graia Application for Mirai',
+              href: 'https://github.com/GraiaProject/Application'
             },
             {
-              label: 'Second Doc',
-              to: 'docs/doc2',
-            },
+              label: 'Broadcast Control',
+              href: 'https://github.com/GraiaProject/BroadcastControl'
+            }
+          ]
+        },
+        {
+          title: '社区 - Community',
+          items: [
+            {
+              label: 'QQ Group',
+              href: 'https://jq.qq.com/?_wv=1027&k=VXp6plBD',
+            }
           ],
         },
         {
-          title: 'Community',
+          title: '更多 - More',
           items: [
             {
-              label: 'Stack Overflow',
-              href: 'https://stackoverflow.com/questions/tagged/docusaurus',
-            },
-            {
-              label: 'Discord',
-              href: 'https://discordapp.com/invite/docusaurus',
-            },
-            {
-              label: 'Twitter',
-              href: 'https://twitter.com/docusaurus',
-            },
-          ],
-        },
-        {
-          title: 'More',
-          items: [
-            {
-              label: 'Blog',
+              label: '开发日志',
               to: 'blog',
-            },
-            {
-              label: 'GitHub',
-              href: 'https://github.com/facebook/docusaurus',
-            },
+            }
           ],
         },
       ],
-      copyright: `Copyright © ${new Date().getFullYear()} My Project, Inc. Built with Docusaurus.`,
+      copyright: `Copyright © ${new Date().getFullYear()} Graia Project. 由 Docusaurus Ⅱ 强力驱动.`,
     },
   },
   presets: [
@@ -86,17 +69,12 @@ module.exports = {
           sidebarPath: require.resolve('./sidebars.js'),
           // Please change this to your repo.
           editUrl:
-            'https://github.com/facebook/docusaurus/edit/master/website/',
-        },
-        blog: {
-          showReadingTime: true,
-          // Please change this to your repo.
-          editUrl:
-            'https://github.com/facebook/docusaurus/edit/master/website/blog/',
-        },
+            'https://github.com/GreyElaina/GraiaDocument/edit/master/docs/',
+        }
+        /*
         theme: {
           customCss: require.resolve('./src/css/custom.css'),
-        },
+        },*/
       },
     ],
   ],
