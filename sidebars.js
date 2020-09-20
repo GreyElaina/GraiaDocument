@@ -5,7 +5,16 @@ module.exports = {
       type: 'category',
       label: '入门',
       items: [
-        'guides/installation'
+        'guides/installation',
+        'guides/about-config',
+        {
+          type: 'category',
+          label: "消息",
+          items: [
+            'guides/message/message-intro',
+            'guides/message/message-chain-intro'
+          ]
+        }
       ],
     },
   ],

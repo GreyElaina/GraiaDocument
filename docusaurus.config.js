@@ -70,11 +70,10 @@ module.exports = {
           // Please change this to your repo.
           editUrl:
             'https://github.com/GreyElaina/GraiaDocument/edit/master/docs/',
-        }
-        /*
+        },
         theme: {
           customCss: require.resolve('./src/css/custom.css'),
-        },*/
+        },
       },
     ],
   ],
