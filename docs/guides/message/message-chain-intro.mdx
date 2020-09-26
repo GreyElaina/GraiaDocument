@@ -62,4 +62,23 @@ sidebar_label: 初识消息链
 
 :::
 
-> # TODO: Internal Message Element 补全 & API 描述组件
+import Card from '@material-ui/core/Card';
+import CardActions from '@material-ui/core/CardActions';
+import CardHeader from '@material-ui/core/CardHeader';
+import CardContent from '@material-ui/core/CardContent';
+import Button from '@material-ui/core/Button';
+import Typography from '@material-ui/core/Typography';
+import Chip from '@material-ui/core/Chip';
+import Box from '@material-ui/core/Box';
+
+<Card variant="outlined">
+  <CardHeader
+    action={
+      <IconButton aria-label="settings">
+        <MoreVertIcon />
+      </IconButton>
+    }
+    title="图片(Image)"
+    subheader="用于描述不同格式(eg. png, jpg)图片的消息元素"
+  />
+</Card>
