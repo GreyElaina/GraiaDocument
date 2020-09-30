@@ -60,6 +60,10 @@ module.exports = {
       ],
       copyright: `Copyright © ${new Date().getFullYear()} Graia Project. 由 Docusaurus Ⅱ 强力驱动.`,
     },
+    prism: {
+      additionalLanguages: ['python'],
+      theme: require('prism-react-renderer/themes/dracula'),
+    }
   },
   presets: [
     [

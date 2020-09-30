@@ -57,10 +57,10 @@ sidebar_label: 初识消息链
 我们定义了以下消息元素:
 
 :::note
-
 这些消息元素可以从 `graia.application.message.elements.internal` 处导入.
-
 :::
+
+## 图片
 
 import Card from '@material-ui/core/Card';
 import CardActions from '@material-ui/core/CardActions';
@@ -69,16 +69,64 @@ import CardContent from '@material-ui/core/CardContent';
 import Button from '@material-ui/core/Button';
 import Typography from '@material-ui/core/Typography';
 import Chip from '@material-ui/core/Chip';
-import Box from '@material-ui/core/Box';
+import Divider from '@material-ui/core/Divider';
+import List from '@material-ui/core/List';
+import ListItem from '@material-ui/core/ListItem';
+import TitleDivider from '@theme/TitleDivider';
 
 <Card variant="outlined">
   <CardHeader
-    action={
-      <IconButton aria-label="settings">
-        <MoreVertIcon />
-      </IconButton>
-    }
     title="图片(Image)"
     subheader="用于描述不同格式(eg. png, jpg)图片的消息元素"
   />
+  <CardContent>
+  <List component="nav">
+  <ListItem>
+
+:::warning
+该消息元素可以通过 `Sendable Checker` 的检查, 但 `Sendable Checker` 不保证该元素在实际应用中的有效性和正确性.
+:::
+
+  </ListItem>
+
+  <TitleDivider>简要说明</TitleDivider>
+  <ListItem>
+
+该消息元素用于表示富文本聊天消息中的图片, 拥有一**尽可能唯一**标识可用于判断图片唯一性.  
+图片分为 "群组聊天图片"(`Group`), "好友聊天图片"(`Friend`) 和 "临时聊天图片"(`Temp`),
+这些可以通过判断 `imageId` 的样式来区分, 但由于我们的高层封装, 你很少需要在意这些问题.
+
+  </ListItem>
+
+  <TitleDivider>属性说明</TitleDivider>
+  <ListItem>
+
+|属性名称|属性类型|备注|
+|:-:|:-:|:-|
+|`imageId`|`Optional[str]`|`mirai` 及 `Graia Framework` 中图片的**尽可能**唯一标识.|
+|`url`|`Optional[str]`|可能存在的指向图片原始数据的 URL, 可以通过 `Image.http_to_bytes` 方法快速从该 URL 下载图片原始数据.|
+|`path`|`Optional[str]`|可能存在的指向已经存在于本地文件的图片的路径.|
+|`type`|`ImageType`|图片的接受途径, 详细请参照 `ImageType` 相关文档.|
+
+  </ListItem>
+
+  </List>
+  </CardContent>
 </Card>
+
+### 简单的发送本地图片
+
+我们可以通过直接使用非异步方法 `Image.fromLocalFile` 方法
+通过传入字符串类型的图片文件路径, 向消息链中插入图片:
+
+```python title="Example of Image.fromLocalFile"
+await app.sendGroupMessage(group, MessageChain.create([
+    Image.fromLocalFile("/home/elaina/pictures/image.png")
+]))
+```
+
+经过测试, 现在可以直接使用该方法发送的图片文件类型有: `png`, `jpg` 和 `gif`(可能有问题).
+
+:::note
+该方法有一不安全版本, 称为 `Image.fromUnsafePath`, 因不推荐使用该种方法发送, 在此不作介绍.
+:::
