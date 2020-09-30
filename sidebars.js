@@ -17,5 +17,13 @@ module.exports = {
         }
       ],
     },
+    {
+      type: 'category',
+      label: "Broadcast Control",
+      items: [
+        'broadcast-control/bcc-about',
+        'broadcast-control/design/bcc-design-dispatcher'
+      ]
+    }
   ],
 };
