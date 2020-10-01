@@ -193,7 +193,81 @@ async def execute_with(name: str, annotation: Any, default: Any) -> Any:
 上下文推进去了, 接下来是一系列迷离的东西, 我们会分开来讲述的, 这里我们先将这些内容分为几大块:
 
  - 普通的参数解析流程;
- - `alive_generator_dispatcher` 相关;
- - `always dispatcher` 相关.
+ - `alive_generator_dispatcher` 相关(与第一部分有重合);
+ - "Always Dispatcher" 相关.
 
-TODO: ANYTHING.
+### 普通的参数解析
+
+在这种用途中, `Dispatcher` 真的就是拿来解析参数的, 猜到了吧,
+这玩意究竟被用作什么不用我说了.
+
+在 `DispatcherInterface.execute_with` 中, 一系列的奇怪的处理后, 就要开始访问 `Dispatcher` 了, 大概的步骤是这样的:
+ - 遍历先前提供的执行上下文中包含有的 `Dispatcher` 集合, 这里我们将遍历过程中得到的单一值称为 `current_dispatcher`, 即 "当前参数解析器";
+ - 分析调用的方式, 并将得到的 `Callable` 存储到对象 `dispatcher_callable`:
+   - 如果是一个继承自 `BaseDispatcher` 的类: 实例化, 且实例化时**不带任何参数**, 之后获取其方法 `catch` 作为接下来被调用的对象;
+   - 如果是一个继承自 `BaseDispatcher` 的类实例: 获取其方法 `catch` 作为接下来被调用的对象;
+   - 如果只是 `Callable`: `dispatcher_callable = current_dispatcher`;
+   - 什么也不是: 抛出 `ValueError`.
+ - 判断 `dispatcher_callable` 是否是(异步)生成器函数:
+   - 如果是: 则调用并生成一个值, 作为参数解析的结果 `result`;
+   - 如果不是: 调用并捕获返回值, 作为参数解析的结果 `result`.
+ - 判断 `result`:
+   - 如果是 `None`: 继续遍历, 即 "继续向下查询";
+   - 如果是特殊对象容器 `Force` 的实例: 获取其属性 `content` 的值并返回, 作为参数解析的结果;
+   - 如果以上条件都不满足: 将 `result` 返回, 作为参数解析的结果.
+
+如果本次执行过程中有生成器被调用, 则会在当前执行完毕后, 即 `DispatcherInterface.enter_context` 方法的 `with statement` 代码块执行完后,
+尝试生成**最多 15 个**值, 与之前的一个加起来, 总共一个生成器**最多被调用 16 次**,
+如果生成完 15 个值后还没有停下来的意思, 则会抛出一 `OutOfMaxGenerater`(超过最大生成量) 错误.
+
+:::tip
+如果你对生成器作为 `Dispatcher` 并参与到参数的解析过程这个步骤感到迷惑, 你可以这样理解:
+
+> 也可能不参与, 毕竟第一个生成的值如果是 `None` 的话也会触发 "继续向下查询" 的行为
+
+```python
+class ExampleDispatcher(BaseDispatcher):
+    def catch(self, interface: DispatcherInterface):
+        ... # 这里的部分会在监听器开始执行前被执行
+        yield ... # 这个值可以是任何类型, 具体行为参考上述
+        ... # 这里的部分会在监听器执行完毕后开始执行
+```
+:::
+
+### alive_generator_dispatcher 相关
+
+我们在上一节中谈过了生成器的部分, 这里仅仅是分出来便于理解.
+
+生成器也可以作为 `Dispatcher` 被 `DispatcherInterface.execute_with` 访问,
+其行为正如上所述:
+
+> 如果本次执行过程中有生成器被调用, 则会在当前执行完毕后, 即 `DispatcherInterface.enter_context` 方法的 `with statement` 代码块执行完后,
+> 尝试生成**最多 15 个**值, 与之前的一个加起来, 总共一个生成器**最多被调用 16 次**,
+> 如果生成完 15 个值后还没有停下来的意思, 则会抛出一 `OutOfMaxGenerater`(超过最大生成量) 错误.
+
+### Always Dispatcher
+
+我们将属性 `always` 的值为 `True` 的继承自 `BaseDispatcher` 的类实例称为 "Always Dispatcher",
+此种 `Dispatcher` 在一次 `DispatcherInterface.execute_with` 方法执行流程中**至少**会被执行/访问一次,
+执行次数 `execute_count` 的值域为 `[1, +∞)`.
+
+## 结束...?
+
+似乎并没有. 
+
+ - 在参数解析的过程中, 有可能因为用户配置不当, 导致出现 `RequirementCrashed` 这个错误:
+   这个错误是因为现有的 `Dispatcher` 集合中的任何一个 `Dispatcher` 都无法处理用户所定义的参数;
+ - 当 `Dispatcher` 被调用时, 你要记住, 它可以访问到整个 `DispatcherInterface`:
+   我们并没有对 `Dispatcher` 对后者的修改和使用, 也就是说, 它也可以使用 `execute_with` 方法,
+   从**自它以后**的 `Dispatcher` 集合中获取值, 并可以对其进行包装和修改, 判断, 一系列的操作都可以.
+
+:::tip
+在我们所提供的 `Depend` 中就使用了这个特性, 效果非常的好.
+:::
+
+此外, 无论是 `Dispatcher` 还是之后会讲到的 `Decorator`/`Decorater`,
+当其抛出错误时, 都会终止本次执行, 并广播 `ExceptionThrowed` 事件;
+我们不保证在监听了 `ExceptionThrowed` 事件的函数如果抛出错误会不会导致整个系统崩溃,
+但大概率, 嗯, 有的, 所以这玩意还是挺危险的.
+
+你可以去看下一章了, 如果有的话, 我们会谈谈 `Decorator`, 这才是正确的拼写.
