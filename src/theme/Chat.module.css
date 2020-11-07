@@ -1,0 +1,72 @@
+.chat-message {
+  position: relative;
+  margin: 1rem 0;
+  transition: transform 0.3s ease-out, opacity 0.3s ease;
+  transform: translateX(0);
+}
+
+.avatar {
+  display: block;
+  width: 3rem;
+  height: 3rem;
+  position: absolute;
+  border-radius: 100%;
+  transform: translateY(-1px);
+  user-select: none;
+  pointer-events: none;
+  text-align: center;
+  line-height: 3rem;
+  font-size: 1.6rem;
+  color: #fff;
+  font-family: "Comic Sans MS";
+}
+
+.nickname {
+  position: relative;
+  margin: 0 0 0.5rem 4.4rem;
+  font-weight: bold;
+}
+
+.message-box {
+  position: relative;
+  margin-left: 4.4rem;
+  width: fit-content;
+  line-height: 1.6;
+  border-radius: 0.5rem;
+  word-break: break-all;
+}
+
+.chat-message:not(.no-padding) .message-box {
+  padding: 0.6rem 0.8rem;
+}
+
+.message-box > img {
+  border-radius: 0.5rem;
+}
+
+.message-box img {
+  vertical-align: middle;
+}
+
+.message-box p > img {
+  margin: 0.2rem 0;
+}
+
+.message-box::before {
+  content: '';
+  position: absolute;
+  right: 100%;
+  top: 0px;
+  width: 12px;
+  height: 12px;
+  border: 0 solid transparent;
+  border-bottom-width: 8px;
+  border-bottom-color: currentColor;
+  border-radius: 0 0 0 32px;
+  color: #fff;
+}
+
+.message-box p {
+  margin: 0;
+  line-height: 1.6;
+}

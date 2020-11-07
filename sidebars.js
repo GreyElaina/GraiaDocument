@@ -14,6 +14,14 @@ module.exports = {
             'guides/message/message-intro',
             'guides/message/message-chain-intro'
           ]
+        },
+        {
+          type: "category",
+          label: "特性",
+          items: [
+            'guides/features/interrupt/interrupt-readme',
+            'guides/features/kanata/kanata-readme'
+          ]
         }
       ],
     },

@@ -1,0 +1,92 @@
+---
+id: interrupt-readme
+title: 中断(Interrupt)
+sidebar-title: 中断(Interrupt)
+---
+
+试着想象这样的情况:
+
+import Chat from "@theme/Chat"
+import ChatPanel from "@theme/ChatPanel"
+
+<ChatPanel title="聊天记录">
+    <Chat nickname="Alice" color="#cc0066">/ban 12345678</Chat>
+    <Chat nickname="Bot" color="#2292dd">请发送 "/confirm" 以确认此操作</Chat>
+    <Chat nickname="Alice" color="#cc0066">/confirm</Chat>
+    <Chat nickname="Bot" color="#2292dd">已将指定用户踢出群组</Chat>
+</ChatPanel>
+
+对于此种交互方式, 我们提供了 `Interrupt` 特性提供对此交互方式操作的封装.
+
+## Quickstart
+
+:::note
+
+本特性计划从 `Application` 迁移到 `BroadcastControl`, 但这里仅描述目前的状况.
+
+:::
+
+``` python
+import asyncio
+from graia.broadcast import Broadcast
+from graia.application import GraiaMiraiApplication
+from graia.application.message.elements.internal import At, Plain
+from graia.application.session import Session
+from graia.application.message.chain import MessageChain
+from graia.application.group import Group, Member
+from graia.application.interrupt import InterruptControl
+from graia.application.interrupt.interrupts import GroupMessageInterrupt
+
+loop = asyncio.get_event_loop()
+
+bcc = Broadcast(loop=loop)
+app = GraiaMiraiApplication(
+    broadcast=bcc,
+    connect_info=...,
+)
+inc = InterruptControl(bcc)
+
+@bcc.receiver("GroupMessage")
+async def group_message_handler(
+    message: MessageChain,
+    app: GraiaMiraiApplication,
+    group: Group, member: Member,
+):
+    if message.asDisplay().startswith("/test_need_confirm"):
+        await app.sendGroupMessage(group, MessageChain.create([
+            At(member.id), Plain("发送 /confirm 以继续运行")
+        ]))
+        # highlight-start
+        await inc.wait(GroupMessageInterrupt(
+            group, member,
+            custom_judgement=lambda x: x.messageChain.asDisplay().startswith("/confirm")
+        ))
+        # highlight-end
+        await app.sendGroupMessage(group, MessageChain.creat([
+            Plain("执行完毕.")
+        ]))
+
+app.launch_blocking()
+```
+
+如上, 你就可以在**任何时候**从无头客户端处接受, 处理无限个信息.
+
+<ChatPanel title="聊天记录">
+    <Chat nickname="Alice" color="#cc0066">/test_need_confirm</Chat>
+    <Chat nickname="Bot" color="#2292dd"><a href="#" style={{"color": "blue"}}>@Alice</a> 发送 "/confirm" 以继续运行</Chat>
+    <Chat nickname="Alice" color="#cc0066">/confirm</Chat>
+    <Chat nickname="Bot" color="#2292dd">执行完毕.</Chat>
+</ChatPanel>
+
+你也可以同时使用循环, 接受多个消息的参数输入.
+
+:::note
+当然, 你也可以使用 `asyncio.wait`, 通过传入 `FIRST_COMPLETED` 到参数 `return_when` 来同时判定多个条件的 `Interrupt`.
+:::
+
+`InterruptControl.wait` 协程方法接受一个 `Interrupt` 实例, 该实例内的 `trigger` 方法将被调用,
+传入事件实例(事件监听类型在 `Interrupt.direct` 处被定义), 当返回非 `None` 值时(通常都为符合要求的事件实例),
+`InterruptControl.wait` 方法将该返回值作为执行结果返回.
+
+我们提供了几个内置的 `Interrupt` 实现, 在 `graia.application.interrupt.interrupts` 下,
+该模块迁移完成后仍会留存.

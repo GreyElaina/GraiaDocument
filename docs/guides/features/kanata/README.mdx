@@ -1,0 +1,81 @@
+---
+id: kanata-readme
+title: Kanata - 标准消息链匹配工具
+sidebar-title: Kanata
+---
+
+> 谨以此名, 致敬 Cytus Ⅱ 中的角色 `Paff`, 本特性名称取自 `mikito` 所作的 [`Kanata`](https://cytus.fandom.com/wiki/KANATA).  
+> Welcome to brand new world.
+
+因为 `MessageChain` 并非传统意义上的, 可以被直接使用正则表达式进行参数提取/关键字匹配...
+不, 我是说复杂点的需求. 总之, 我们提供了 `Kanata` 作为解决本问题的方案.
+
+## Quickstart
+
+``` python
+import asyncio
+from graia.broadcast import Broadcast
+from graia.application import GraiaMiraiApplication
+from graia.application.message.elements.internal import At, Plain
+from graia.application.session import Session
+from graia.application.message.chain import MessageChain
+from graia.application.group import Group, Member
+from graia.application.message.parser.kanata import Kanata
+from graia.application.message.parser.signature import FullMatch, OptionalParam, RequireParam
+
+loop = asyncio.get_event_loop()
+
+bcc = Broadcast(loop=loop)
+app = GraiaMiraiApplication(
+    broadcast=bcc,
+    connect_info=...,
+)
+
+# highlight-start
+@bcc.receiver("GroupMessage", dispatchers=[
+    # 注意是 dispatcher, 不要和 headless_decorater 混起来
+    Kanata([FullMatch("as the saying goes: "), RequireParam(name="saying")])
+])
+# highlight-end
+async def group_message_handler(
+    message: MessageChain,
+    app: GraiaMiraiApplication,
+    group: Group, member: Member,
+    # highlight-next-line
+    saying: MessageChain
+):
+    await app.sendGroupMessage(group, MessageChain.create([
+        # highlight-next-line
+        Plain(f"就像这句谚语所述: {saying.asDisplay()}")
+    ]))
+
+app.launch_blocking()
+```
+
+执行这段代码:
+
+import Chat from "@theme/Chat"
+import ChatPanel from "@theme/ChatPanel"
+
+<ChatPanel title="聊天记录">
+    <Chat nickname="Alice" color="#cc0066">as the saying goes: in Rome, do as the Romans do.</Chat>
+    <Chat nickname="Bot" color="#2292dd">就像这句谚语所述: in Rome, do as the Romans do.</Chat>
+</ChatPanel>
+
+:::note
+当匹配失败时, 默认会取消本次执行, 若不需要, 实例化 `Kanata` 时请附上 `stop_exec_if_fail=False`.
+:::
+
+`Kanata` 会检查整个消息链, 并判断是否**完全符合**所给出的标识列表,
+并以此决定是否取消本次执行.
+
+可使用的标识(`Signature`), 这些都存在于 `graia.application.message.parser.signature` 下:
+
+ - `FullMatch`: 完全匹配一段文本
+ - `RegexMatch`: 根据所给出的正则匹配一段文本
+ - `RequireParam`: 匹配的参数, 若无法匹配到则判定本次执行失败, 即 "必选参数"
+ - `OptionalParam`: 匹配的参数, 若无法匹配到则将参数设为 `None`, 即 "可选参数"
+
+同时我们提供贪婪模式(`Greed Mode`), 只需要实例化 `RequireParam` 或是 `OptionalParam` 时,
+设 `isGreed=True` 即可启用; 在该模式下, 会尽可能多的匹配内容到参数.
+

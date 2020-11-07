@@ -1,0 +1,29 @@
+.panel-view {
+    position: relative;
+    border-radius: 6px;
+    margin: 1rem 0;
+    overflow-x: auto;
+  }
+  .panel-view .controls {
+    display: initial;
+    position: absolute;
+    top: 0.8rem;
+    width: 100%;
+  }
+  .panel-view .controls .title {
+    text-align: center;
+    width: 100%;
+    font-size: 0.9rem;
+    line-height: 1rem;
+  }
+  .panel-view .content {
+    padding: 0.2rem 1.2rem;
+    width: fit-content;
+  }
+  .panel-view.mini .controls {
+    display: none;
+  }
+  .panel-view:not(.mini) .content {
+    padding-top: 2rem;
+  }
+  
