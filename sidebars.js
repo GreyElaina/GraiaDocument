@@ -20,7 +20,10 @@ module.exports = {
           label: "特性",
           items: [
             'guides/features/interrupt/interrupt-readme',
-            'guides/features/kanata/kanata-readme'
+            'guides/features/kanata/kanata-readme',
+            'guides/features/components-selector',
+            'guides/features/template-readme',
+            'guides/features/custom-logger'
           ]
         }
       ],
