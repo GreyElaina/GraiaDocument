@@ -33,6 +33,7 @@ module.exports = {
       label: "Broadcast Control",
       items: [
         'broadcast-control/bcc-about',
+        'broadcast-control/bcc-custom-event',
         'broadcast-control/design/bcc-design-dispatcher'
       ]
     }

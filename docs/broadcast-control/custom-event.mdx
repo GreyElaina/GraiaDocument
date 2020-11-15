@@ -1,0 +1,123 @@
+---
+id: bcc-custom-event
+title: 自定义事件
+sidebar-title: 自定义事件
+---
+
+在 `Broadcast Control` 中, 任何人都可以声明一个事件并使其在程序内部全局有效,
+但其只能同时在一个 `Broadcast` 实例内通过 `postEvent` 方法广播事件.
+
+## 声明事件
+
+你需要通过创建一个继承了 `BaseEvent` 的类, 并声明一个 `Dispatcher` 作为事件层级的顶级参数解析器.
+
+`Dispatcher` 内需要声明一个接受外部调用的 `catch` 方法,
+该方法能且只能接受一个 `DispatcherInterface`(或者 `IDispatcherInterface`) 实例,
+通常的, 这个实例就是 `Broadcast.dispatcher_interface`.
+
+``` python
+from graia.broadcast.entities.event import BaseEvent
+from graia.broadcast.entities.dispatcher import BaseDispatcher
+from graia.broadcast.interfaces.dispatcher import DispatcherInterface
+
+class ExampleEvent(BaseEvent):
+    class Dispatcher(BaseDispatcher):
+        # def catch(self, interface: DispatcherInterface) -> Any:
+        #     return ...
+        
+        async def catch(self, interface: DispatcherInterface) -> Any:
+            return ...
+```
+
+就这样, 你就成功声明了一个事件.
+
+:::tip
+
+这个类默认继承 `pydantic` 的 `BaseModel`, 所以当你给你的事件声明加属性时,
+请保证你的 `__init__` 中不要出现类似 `self.xxx = xxx` 这样的语句,
+而是使用 `super().__init__(xxx=xxx)`, 并在声明类时使用 `Type Hints` 声明 `xxx` 的类型.
+
+``` python
+class ExampleEvent(BaseEvent):
+    attr1: Any
+
+    def __init__(self, attr1):
+        ...
+        super().__init__(attr1=attr1)
+    
+    ...
+```
+
+同样, 当你实例化事件时, 你的 IDE 提示大概是这样的:
+
+```
+ExampleEvent(**kwargs) // 这谁看的出来要传什么才能实例化啊喂?!
+```
+
+所以我们强烈推荐你重写 `__init__` 以获得更好的代码补全支持
+
+::: tip
+
+然后就可以实例化, 并通过 `Broadcast.postEvent` 方法广播事件了
+
+``` python
+broadcast = Broadcast(...)
+
+event = ExampleEvent(...)
+broadcast.postEvent(event)
+```
+
+监听事件:
+
+``` python
+@broadcast.receiver(ExampleEvent)
+# 使用字符串也可以:
+# @broadcast.receiver("ExampleEvent")
+def example_listener(event: ExampleEvent):
+    ...
+```
+
+## 扩展 Dispatcher
+
+通过访问 `DispatcherInterface`, 你可以向监听器所声明的符合规则的各式参数传递相对应的值:
+
+``` python
+class Dispatcher(BaseDispatcher):
+    def catch(self, interface: DispatcherInterface):
+        if interface.name == "attr1":
+            # 当参数名称为 "attr1" 时, 控制 Executor 向该参数传值 "resp1"
+            return "resp1"
+        elif interface.annotation == "i need value!":
+            # 当参数的类型注解为 "i need value!" 时, 控制 Executor 向该参数传值 "ok, here."
+            return "ok, here."
+        elif interface.default == "i had a default value":
+            # 当参数的类型注解为 "i had a default value" 时, 控制 Executor 向该参数传值 "no, it mustn't be it."
+            return "no, it mustn't be it."
+```
+
+你也可以声明 `mixin`, 让其他 Dispatcher 给你代劳:
+
+``` python
+class Dispatcher_1(BaseDispatcher):
+    def catch(self, interface: DispatcherInterface):
+        if interface.name == "attr1":
+            # 当参数名称为 "attr1" 时, 控制 Executor 向该参数传值 "resp1"
+            return "resp1"
+
+class Dispatcher_2(BaseDispatcher):
+    def catch(self, interface: DispatcherInterface):
+        if interface.name == "attr2":
+            # 当参数名称为 "attr2" 时, 控制 Executor 向该参数传值 "resp2"
+            return "resp2"
+
+class Dispatcher(BaseDispatcher):
+    mixin = [Dispatcher_1, Dispatcher_2]
+
+    def catch(self, interface: DispatcherInterface):
+        if interface.name == "attr1":
+            # 可以拦截, 改变 mixin 中的 Dispatcher 的行为.
+            return "override resp1"
+        elif interface.name == "attr3":
+            # 当参数名称为 "attr3" 时, 控制 Executor 向该参数传值 "resp3"
+            return "resp3"
+```
