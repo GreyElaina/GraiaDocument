@@ -34,6 +34,8 @@ module.exports = {
       items: [
         'broadcast-control/bcc-about',
         'broadcast-control/bcc-custom-event',
+        'broadcast-control/bcc-interrupt',
+        'broadcast-control/bcc-inline-cache',
         'broadcast-control/design/bcc-design-dispatcher'
       ]
     }

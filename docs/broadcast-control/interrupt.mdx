@@ -1,0 +1,100 @@
+---
+id: bcc-interrupt
+title: 中断(Interrupt)
+sidebar-title: 中断(Interrupt)
+---
+
+:::note
+本章所述内容是 Application 的特性 Interrupt 的迁移+重置版, 原特性将在几个版本后被弃用.
+
+顺便, scheduler 也有独立于 application 的打算
+:::
+
+试着想象这样的情况:
+
+import Chat from "@theme/Chat"
+import ChatPanel from "@theme/ChatPanel"
+
+<ChatPanel title="聊天记录">
+    <Chat nickname="Alice" color="#cc0066">/ban 12345678</Chat>
+    <Chat nickname="Bot" color="#2292dd">请发送 "/confirm" 以确认此操作</Chat>
+    <Chat nickname="Alice" color="#cc0066">/confirm</Chat>
+    <Chat nickname="Bot" color="#2292dd">已将指定用户踢出群组</Chat>
+</ChatPanel>
+
+对于此种交互方式, 我们提供了 `Interrupt` 特性提供对此交互方式操作的封装.
+
+## Quickstart
+
+``` python
+import asyncio
+from graia.broadcast import Broadcast
+from graia.application import GraiaMiraiApplication
+from graia.application.message.elements.internal import At, Plain
+from graia.application.session import Session
+from graia.application.message.chain import MessageChain
+from graia.application.group import Group, Member
+from graia.broadcast.interrupt import InterruptControl
+from graia.broadcast.interrupt.waiter import Waiter
+from graia.application.event.messages import GroupMessage
+
+bcc = Broadcast(loop=loop)
+app = GraiaMiraiApplication(
+    broadcast=bcc,
+    connect_info=...,
+)
+inc = InterruptControl(bcc)
+
+@bcc.receiver("GroupMessage")
+async def group_message_handler(
+    message: MessageChain,
+    app: GraiaMiraiApplication,
+    group: Group, member: Member,
+):
+    if message.asDisplay().startswith("/test_need_confirm"):
+        await app.sendGroupMessage(group, MessageChain.create([
+            At(member.id), Plain("发送 /confirm 以继续运行")
+        ]))
+        # highlight-start
+        @Waiter.create_using_function([GroupMessage])
+        def waiter(
+            event: GroupMessage, waiter_group: Group,
+            waiter_member: Member, waiter_message: MessageChain
+        ):
+            if all([
+                waiter_group.id == group.id,
+                waiter_member == member.id,
+                waiter_message.asDisplay().startswith("/confirm")
+            ]):
+                return event
+
+        await inc.wait(waiter)
+        # highlight-end
+        await app.sendGroupMessage(group, MessageChain.creat([
+            Plain("执行完毕.")
+        ]))
+
+app.launch_blocking()
+```
+
+如上, 你就可以在**任何时候**从无头客户端处接受, 处理无限个信息.
+
+<ChatPanel title="聊天记录">
+    <Chat nickname="Alice" color="#cc0066">/test_need_confirm</Chat>
+    <Chat nickname="Bot" color="#2292dd"><a href="#" style={{"color": "blue"}}>@Alice</a> 发送 "/confirm" 以继续运行</Chat>
+    <Chat nickname="Alice" color="#cc0066">/confirm</Chat>
+    <Chat nickname="Bot" color="#2292dd">执行完毕.</Chat>
+</ChatPanel>
+
+你也可以同时使用循环, 接受多个消息的参数输入.
+
+:::note
+可以同时监听多个事件, 往 `Waiter.create_using_function` 那个列表里面加事件类声明引用就好了.
+
+当然, 也可以使用 `dispatcher`, `decorator`, 甚至是内部访问(`internal access`).  
+是否使用内联缓存看 `Broadcast` 的全局配置.
+:::
+
+`InterruptControl.wait` 协程方法接受一个 `Waiter` 实例,
+该实例的属性值 `detected_event` 将像一个 Listener 一样被调用(可以将 `Waiter.create_using_function` 当作 `Broadcast.receiver`),
+当这个 Callable 返回非 `None` 值时, `InterruptControl.wait` 方法将该返回值作为执行结果返回.
