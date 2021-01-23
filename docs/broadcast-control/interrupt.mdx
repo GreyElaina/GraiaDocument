@@ -63,7 +63,7 @@ async def group_message_handler(
         ):
             if all([
                 waiter_group.id == group.id,
-                waiter_member == member.id,
+                waiter_member.id == member.id,
                 waiter_message.asDisplay().startswith("/confirm")
             ]):
                 return event
