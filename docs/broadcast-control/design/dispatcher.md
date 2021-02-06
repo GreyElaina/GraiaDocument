@@ -1,7 +1,7 @@
 ---
 id: bcc-design-dispatcher
-title: 参数解析器(Dispatcher)及其接口
-sidebar-title: 参数解析器(Dispatcher)
+title: 参数解析器 (Dispatcher) 及其接口
+sidebar-title: 参数解析器 (Dispatcher)
 ---
 
 :::note

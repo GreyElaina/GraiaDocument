@@ -1,7 +1,7 @@
 ---
 id: bcc-inline-cache
-title: 内联缓存(Inline Cache)
-sidebar-title: 内联缓存(Inline Cache)
+title: 内联缓存 (Inline Cache)
+sidebar-title: 内联缓存 (Inline Cache)
 ---
 
 为了提供更好的性能, 我们提供了内联缓存特性, 通过缓存能够给出结果的 `Dispatcher`,
