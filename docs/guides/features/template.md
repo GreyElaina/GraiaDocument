@@ -81,7 +81,7 @@ regex.match(r"^(?|(\$[a-zA-Z_][a-zA-Z0-9_]*)|(\$[0-9]*))$", "$我不是模板块
 :::
 
 ``` python
-Template(f"Hello, $target! 在你的 Github, 今天共收获了 {star_increase} 个 star, Congratulations!").render(
+Template(f"Hello, $target! 在你的 GitHub, 今天共收获了 {star_increase} 个 star, Congratulations!").render(
     target=At(member.id)
 )
 ```

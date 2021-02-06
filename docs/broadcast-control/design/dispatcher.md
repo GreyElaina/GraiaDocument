@@ -40,7 +40,7 @@ sidebar-title: 参数解析器(Dispatcher)
 
 到现在为止还挺好理解, 不是么?
 
-### 处理 Dispatcher 集合/列表
+### 处理 Dispatcher 集合 / 列表
 
 在定义事件时, 我们会要求事件内定义一个 `Dispatcher` 的类, 并且继承自 `BaseDispatcher`.
 这个类用于定义事件本身的 `Dispatcher`.
