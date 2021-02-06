@@ -4,7 +4,7 @@ title: 关于 Broadcast Control
 sidebar-title: 关于
 ---
 
-::: note
+:::note
 `BCC` 是 `Broadcast Control`, 官方译名 "广播控制" 的缩写.
 :::
 
