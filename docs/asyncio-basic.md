@@ -4,7 +4,7 @@ title: asyncio 基础教程
 sidebar-title: 附录 - asyncio 基础教程
 ---
 
-`asyncio` 在 python 3.4 即成为标准库, 我们在这里使用 3.8 版本.
+`asyncio` 在 Python 3.4 即成为标准库, 我们在这里使用 3.8 版本.
 
 ## 导入模块
 
@@ -14,7 +14,7 @@ sidebar-title: 附录 - asyncio 基础教程
 import asyncio
 ```
 
-## 声明异步函数/方法
+## 声明异步函数 / 方法
 
 同样非常简单, 在 `3.5` 版本中就有 `async` 和 `await` 两个关键字.  
 `await` 关键字用于在一个异步执行内调用其他的异步函数/方法并获取其返回值.
@@ -43,7 +43,7 @@ class Example:
 也不是非常推荐使用 `async_property`.
 :::
 
-## 获取事件循环(Event Loop)对象
+## 获取事件循环 (Event Loop) 对象
 
 事件循环用来在 `async` 代码块外部运行异步相关的东西. 与同步相对的就是异步, 你这样理解就好.
 
@@ -53,7 +53,7 @@ class Example:
 loop = asyncio.get_event_loop()
 ```
 
-## 运行异步函数/方法
+## 运行异步函数 / 方法
 
 使用 `loop.run_until_complete` 或者 `asyncio.run`(3.7 及以上) 即可.
 

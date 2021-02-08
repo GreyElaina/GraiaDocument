@@ -12,7 +12,7 @@ sidebar_label: 安装并配置开发环境
 :::important 重要
 
 如果你使用时开发库出现了错误, 应先检查是否是 `Graia Framework` 的错误, 
-确认之后, 请在我们的 [Github Issues](https://github.com/GraiaProject/Application/issues) 处汇报你的错误, 
+确认之后, 请在我们的 [GitHub Issues](https://github.com/GraiaProject/Application/issues) 处汇报你的错误, 
 我们会尽快处理问题
 
 :::
