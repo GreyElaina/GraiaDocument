@@ -54,11 +54,11 @@ class ExampleEvent(BaseEvent):
 ExampleEvent(**kwargs) // 这谁看的出来要传什么才能实例化啊喂?!
 ```
 
-所以我们强烈推荐你重写 `__init__` 以获得更好的代码补全支持
+所以我们强烈推荐你重写 `__init__` 以获得更好的代码补全支持.
 
 ::: tip
 
-然后就可以实例化, 并通过 `Broadcast.postEvent` 方法广播事件了
+然后就可以实例化, 并通过 `Broadcast.postEvent` 方法广播事件了.
 
 ``` python
 broadcast = Broadcast(...)
