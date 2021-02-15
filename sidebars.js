@@ -30,13 +30,20 @@ module.exports = {
     },
     {
       type: 'category',
-      label: "Broadcast Control",
+      label: "Broadcast Control Old-Docs",
       items: [
-        'broadcast-control/bcc-about',
-        'broadcast-control/bcc-custom-event',
-        'broadcast-control/bcc-interrupt',
-        'broadcast-control/bcc-inline-cache',
-        'broadcast-control/design/bcc-design-dispatcher'
+        'broadcast-control-old/bcc-about',
+        'broadcast-control-old/bcc-custom-event',
+        'broadcast-control-old/bcc-interrupt',
+        'broadcast-control-old/bcc-inline-cache',
+        'broadcast-control-old/design/bcc-design-dispatcher'
+      ]
+    },
+    {
+      type: 'category',
+      label: "Saya",
+      items: [
+        'saya/saya-index',
       ]
     }
   ],

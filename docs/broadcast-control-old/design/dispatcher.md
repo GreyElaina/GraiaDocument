@@ -265,9 +265,9 @@ class ExampleDispatcher(BaseDispatcher):
 在我们所提供的 `Depend` 中就使用了这个特性, 效果非常的好.
 :::
 
-此外, 无论是 `Dispatcher` 还是之后会讲到的 `Decorator`/`Decorater`,
+此外, 无论是 `Dispatcher` 还是之后会讲到的 `Decorator`,
 当其抛出错误时, 都会终止本次执行, 并广播 `ExceptionThrowed` 事件;
 我们不保证在监听了 `ExceptionThrowed` 事件的函数如果抛出错误会不会导致整个系统崩溃,
 但大概率, 嗯, 有的, 所以这玩意还是挺危险的.
 
-你可以去看下一章了, 如果有的话, 我们会谈谈 `Decorator`, 这才是正确的拼写.
+你可以去看下一章了, 如果有的话, 我们会谈谈 `Decorator`.

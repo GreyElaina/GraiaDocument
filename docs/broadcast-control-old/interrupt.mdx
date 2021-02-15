@@ -98,3 +98,9 @@ app.launch_blocking()
 `InterruptControl.wait` 协程方法接受一个 `Waiter` 实例,
 该实例的属性值 `detected_event` 将像一个 Listener 一样被调用(可以将 `Waiter.create_using_function` 当作 `Broadcast.receiver`),
 当这个 Callable 返回非 `None` 值时, `InterruptControl.wait` 方法将该返回值作为执行结果返回.
+
+:::tip
+在 `Graia Application` 中, 我们提供了几个开箱即用的 `Waiter` 类, 或许对你的开发有所帮助...?
+
+你可以在 `graia.application.interrupts` 处找到他们.
+:::
