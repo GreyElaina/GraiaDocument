@@ -45,6 +45,20 @@ module.exports = {
       items: [
         'saya/saya-index',
       ]
+    },
+    {
+      type: 'category',
+      label: "Broadcast Guide",
+      items: [
+        'broadcast/broadcast-index',
+        {
+          type: 'category',
+          label: "Basic",
+          items: [
+            'broadcast/basic/broadcast-basic-getting-start',
+          ]
+        },
+      ]
     }
   ],
 };

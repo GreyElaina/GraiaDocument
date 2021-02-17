@@ -1,7 +1,7 @@
 ---
-id: broadcast-control-basic-getting-start
-title: 初次见面
-sidebar-title: 初次见面
+id: broadcast-basic-getting-start
+title: 起点与特性概览
+sidebar-title: 一切的起点
 ---
 
 ## Installation
@@ -77,7 +77,9 @@ async def event_receiver(event: ExampleEvent):
     print(event)
 ```
 
-你需要也仅需要声明类型注解为 `ExampleEvent` 才能获取到事件的类实例.
+你需要也仅需要声明类型注解为 `ExampleEvent` 就能获取到事件的类实例.
+
+这里的 `event_receiver`, 我们称其为 "监听器(Listener)".
 
 ## Create and broadcast an event
 
@@ -109,3 +111,137 @@ class ExampleEvent(BaseEvent):
 :::tip
 这里的 `catch` 需定义为一异步方法, 且需要使用 `staticmethod` 装饰器.
 :::
+
+在事件广播, 而监听器监听到事件时, 会启动一个异步任务, 里面装着叫 "执行器(Executor)" 的玩意.  
+执行器负责解析监听器的参数声明, 生成合适的参数, 并传给监听器执行.
+
+在 Dispatcher 内, 我们可以获取到一个叫 `DispatcherInterface` 的玩意.  
+而 Dispatcher 在原本的实现里, 本就是这玩意调用的它, 自然也要为它服务.
+但我们只要通过返回值给他, 就算是服务了, 真是敷衍.
+
+但是, 慢着, 如果我们真的直接 `return`, 那么会发生什么?
+你可以试试执行下这段代码:
+
+```py
+import asyncio
+from graia.broadcast import Broadcast
+from graia.broadcast.entities.event import BaseEvent
+from graia.broadcast.entities.dispatcher import BaseDispatcher
+
+class ExampleEvent(BaseEvent):
+    class Dispatcher(BaseDispatcher):
+        @staticmethod
+        async def catch(interface):
+            return "alalalalalalalalalabalalalbal." # 随便什么值吧.
+
+def test_func(s, r, u, z, j: str, k: int, l: float = 1): # 非常正常的函数...?
+    print(f"{s=}, {r=}, {u=}, {z=}, {j=}, {k=}, {l=}")
+
+loop = asyncio.get_event_loop()
+broadcast = Broadcast(loop=loop)
+loop.run_until_complete(broadcast.Executor(
+    target=test_func,
+    event=ExampleEvent(),
+))
+```
+
+悲伤的返回:
+
+```
+s='alalalalalalalalalabalalalbal.', r='alalalalalalalalalabalalalbal.', u='alalalalalalalalalabalalalbal.', z='alalalalalalalalalabalalalbal.', j='alalalalalalalalalabalalalbal.', k='alalalalalalalalalabalalalbal.', l='alalalalalalalalalabalalalbal.'
+```
+
+虽然有点搞笑, 但这也告诉我们: 绝对不能随随便便就在 Dispatcher 里面写一个值的返回.
+
+而这是因为在解析参数声明时, 执行器会把一个一个的参数声明, 放到 Dispatcher Interface 里面,
+然后让它去一个一个调用 Dispatcher, 进而完成对参数的解析.
+
+一般来说, 我们都希望 Dispatcher 在某个参数上起作用, 但是这句话还能扩展为: **在满足特定条件的参数声明上起作用**.
+而要检查这些条件是否满足, 我们就需要调用 Dispatcher Interface 提供的各式接口:
+
+|接口名称|接口类型|备注|
+|:-:|:-:|:-:|
+|`event`|`BaseEvent`|触发当前监听器的事件实例|
+|`name`|`str`|正在处理的参数的名称|
+|`annotation`|`Any`|正在处理的参数, 它的类型注解|
+|`default`|`Any`|正在处理的参数所设的默认值|
+
+:::note
+这些接口, 都是通过一个堆栈实现 + `property`实现的.
+:::
+
+通过访问这些接口, 取得执行环境中的值, 我们就可以合理的解析参数,
+汇总信息.
+
+下面这段代码, 改编自上面的那段, 但是它运行正确.
+
+```py
+import asyncio
+from graia.broadcast import Broadcast
+from graia.broadcast.entities.event import BaseEvent
+from graia.broadcast.entities.dispatcher import BaseDispatcher
+
+class ExampleEvent(BaseEvent):
+    class Dispatcher(BaseDispatcher):
+        @staticmethod
+        async def catch(interface):
+            if interface.annotation is int:
+                return 1
+
+def test_func(k: int): # 非常正常的函数...?
+    print(f"{k=}")
+
+loop = asyncio.get_event_loop()
+broadcast = Broadcast(loop=loop)
+loop.run_until_complete(broadcast.Executor(
+    target=test_func,
+    event=ExampleEvent(),
+))
+```
+
+将会输出:
+
+```
+k=1
+```
+
+这才是合理的返回.
+
+## Inject Dispatcher in receiver
+
+我们也同样实现了在 `Broadcast.receiver` 方法里面塞 Dispatcher 的魔法,
+这些 Dispatcher 会且仅会在对应的监听器~~作妖~~起作用.  
+顺便, 这些 Dispatcher 最好为类的实例.
+
+```py
+class ExampleEvent(BaseEvent):
+    class Dispatcher(BaseDispatcher):
+        @staticmethod
+        async def catch(interface):
+            if interface.annotation is int:
+                return 1
+
+class ExampleDispatcher(BaseDispatcher):
+    def __init__(self, text: str):
+        self.text = text
+
+    async def catch(self, interface: DispatcherInterface):
+        if interface.name == "brain_power":
+            return "OOOOOOOOOAAAAEEAAE"
+
+@broadcast.receiver("ExampleEvent", dispatchers=[
+    ExampleDispatcher()
+])
+def test_func(brain_power: int): # 注意: 我们同时提供了特定的参数名称和特殊的类型注解
+    print(f"brain_power={brain_power}")
+```
+
+广播事件, 打印结果为:
+
+```
+brain_power=OOOOOOOOOAAAAEEAAE
+```
+
+因为我们设计的是 "局部特殊规则优先"(就先这样说吧),
+在局部的, 被显式指定的, 要比在更大范围的, 隐式的优先, 前者会覆盖后者的行为, 在这里, 我们在声明监听器时, 显式的传入了一个覆盖了原先行为的 Dispatcher,
+所以最后, `brain_power` 的值才会是文本 `"OOOOOOOOOAAAAEEAAE"` 而不是 整数 `1`.
