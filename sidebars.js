@@ -59,6 +59,7 @@ module.exports = {
           ]
         },
       ]
-    }
+    },
+    "asyncio-basic"
   ],
 };
