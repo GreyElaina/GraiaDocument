@@ -56,6 +56,7 @@ module.exports = {
           label: "Basic",
           items: [
             'broadcast/basic/broadcast-basic-getting-start',
+            'broadcast/basic/decorator-guide'
           ]
         },
       ]
