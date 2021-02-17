@@ -9,7 +9,7 @@ Broadcast Control 是一套完整的, 基于 `asyncio` 异步机制, 提供具�
 
  - Broadcast Control 现仅支持 Python 的 `3.7` 及其以上版本
  - 本文档撰写时, Broadcast Control 发布在 PyPI 上的版本为 `0.6.4`, 现在的版本为 [[PyPI](https://pypi.org/project/graia-broadcast/)](https://img.shields.io/pypi/v/graia-broadcast).
- - **若无特殊说明, 本文档针对 `graia-broadcast==0.6.4` 进行说明.**
+ - **若无特殊说明, 本文档针对 `graia-broadcast==0.7.0` 进行说明.**
  - 在阅读本文档时, 请先对 Python 的异步编程有一定了解(例如 `asyncio`, `gevent` 等), 若没有相关的知识, 请先前往本文档的 [Asyncio 使用速成](/asyncio-basic).
  - Graia Project 为 NatriumLab 下的项目
  - 任何问题请前往 Github issue 处寻找解决方法或者提出 issue.
