@@ -185,8 +185,10 @@ class ExampleEvent(BaseEvent):
     class Dispatcher(BaseDispatcher):
         @staticmethod
         async def catch(interface):
-            if interface.annotation is int:
+            # highlight-start
+            if interface.annotation is int: # 判断类型注解是否为 int
                 return 1
+            # highlight-end
 
 def test_func(k: int): # 非常正常的函数...?
     print(f"{k=}")
@@ -244,4 +246,5 @@ brain_power=OOOOOOOOOAAAAEEAAE
 
 因为我们设计的是 "局部特殊规则优先"(就先这样说吧),
 在局部的, 被显式指定的, 要比在更大范围的, 隐式的优先, 前者会覆盖后者的行为, 在这里, 我们在声明监听器时, 显式的传入了一个覆盖了原先行为的 Dispatcher,
-所以最后, `brain_power` 的值才会是文本 `"OOOOOOOOOAAAAEEAAE"` 而不是 整数 `1`.
+所以最后, `brain_power` 的值才会是文本 `"OOOOOOOOOAAAAEEAAE"` 而不是 整数 `1`; 这也是 `Dispatcher Inject`,
+即 "解析器注入" 的最简示例.

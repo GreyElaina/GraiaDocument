@@ -95,6 +95,6 @@ def test_func(k: "random_float" = GodsChoice()):
 |`default`|`Literal[None]`|恒为 `None`, 仅用于占位|
 |`return_value`|`Any`|已经获取到的参数值; 如果 Decorator 的类属性 `pre` 为 `True`, 则该值为 `None`, 也就是不会获取.|
 |`dispatcher_interface`|`DispatcherInterface`|当前参数解析器接口的实例|
-|`local_storage`|`Dict[Any, Any]`|状态存储, 可以用于在不同参数的修饰器间的信息交换, 在执行结束后仍保留|
+|`local_storage`|`Dict[Any, Any]`|状态存储, 可以用于在不同参数的修饰器间的信息交换, 在执行结束后仍保留, 与整个应用共用一个生命周期|
 
 在这些接口中, `dispatcher_interface` 仍是你最强大的武器, 请妥善使用.
