@@ -70,7 +70,7 @@ async def group_message_handler(
 
         await inc.wait(waiter)
         # highlight-end
-        await app.sendGroupMessage(group, MessageChain.creat([
+        await app.sendGroupMessage(group, MessageChain.create([
             Plain("执行完毕.")
         ]))
 
